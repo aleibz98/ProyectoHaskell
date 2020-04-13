@@ -1,6 +1,45 @@
 import Data.List
 import System.Random
 
+-- NOTES TO IMPLEMENT 
+    -- Shuold implement a module that represents a game state so a local search can be performed
+    -- My IA should work with a tree of possible game states and where we can permorm a game theory local search
+    -- game -> state -> turn, winner, isDraw, Board -> [[Maybe Int]]
+    -- globals -> difficultity, numRows, numCols
+
+
+
+
+module State (
+    -- Atributes
+    turn
+    winner
+    isDraw
+    _board
+
+    -- Methods
+    newBoard :: Board
+
+    checkVertical :: (Row, Column) -> Board
+    checkHorizontal :: 
+    checkDiagDown ::
+    checkDiagUp ::
+    checkAll ::
+) where
+    newBoard (i,j) = Con (replicate j []) (i,j)
+    checkVertical :: 
+    checkHorizontal :: 
+    checkDiagDown ::
+    checkDiagUp ::
+    checkAll ::
+
+module Board (
+
+) where
+
+---------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------  
+
 -- Type to codify a position by its coords
 type Row = Int
 type Column = Int
