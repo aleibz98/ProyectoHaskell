@@ -25,13 +25,28 @@ module State (
     checkDiagDown ::
     checkDiagUp ::
     checkAll ::
+
+    readMove :: 
+    isLegalMove ::
+    executeMove ::
 ) where
     newBoard (i,j) = Con (replicate j []) (i,j)
-    checkVertical :: 
-    checkHorizontal :: 
-    checkDiagDown ::
-    checkDiagUp ::
-    checkAll ::
+    
+    checkVertical :: Board -> Position -> Player -> Bool
+    checkVertical b pos player =
+
+    checkHorizontal :: Board -> Position -> Player -> Bool
+    checkHorizontal b pos player = 
+
+    checkDiagUp :: Board -> Position -> Player -> Bool
+    checkDiagUp b pos player = 
+
+    checkDiagDown :: Board -> Position -> Player -> Bool
+    checkDiagDown b pos player = 
+
+    checkAll :: Board -> Position -> Player -> Bool
+    checkAll b pos player = do
+        return (checkVertical b pos player || checkDiagDown b pos player || checkDiagUp b pos player || checkHorizontal b pos player)
 
 module Board (
 
