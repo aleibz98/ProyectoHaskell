@@ -13,11 +13,6 @@ data Ficha = X | O
 data PartidaTerminada = NoTerminada | Ganador Jugador | Empate
 
 -- FUNCIONES AUXILIARES --------------------------------------------------------------
--- A que jugador le toca ejecutar un movimiento
-SigJugador :: Jugador -> Jugador
-SigJugador X = O
-SigJugador O = X
-
 -- Selección de la estategia de la IA
 chooseIA :: Maybe IO Int 
 chooseIA = do
@@ -41,6 +36,14 @@ leerJugada Just ia = do         -- IA
     putStr "Enter your move: "
     x <- getLine
     return (read x)
+
+printWinner :: Jugador -> IO ()
+printWinner jugador = do
+    putStrLn "HA GANADO EL JUGADOR"
+
+printDraw :: IO ()
+printDraw = do
+    putStrLn "EMPATE"
 
 
 -- MODULOS ---------------------------------------------------------------------------
@@ -73,6 +76,11 @@ module Tablero(
 
     --Dice si existen 4 piezas del mismo jugador seguidas
     cuatroEnRaya :: [Posicion] -> Maybe Jugador
+
+    --PRINTS
+    printFila :: Vec.Vector -> IO ()
+    printTablero :: Tablero -> IO ()
+
 
 
 
@@ -116,7 +124,19 @@ module Tablero(
     cuatroEnRaya (v:w:x:y:z)
         | v == w && w == x && x == y = Just x
         | otherwise = cuatroEnRaya (w:x:y:z)
+
+    printFila fila = do
+        V.mapM_ (putChar . maybe '.' (head . show)) fila >> putStrLn ""
         
+    printTablero tablero = do
+        mapM_ (putStr . show) [0..6]
+        putStrLn ""
+        V.mapM_ printFila transTablero tablero
+            -- Haremos la transpuesta del tablero para que sea más facil de imprimir
+            where transTablero tablero1 = do
+                fila <- V.fromList [0..6]
+                return (V.map (!fila) tablero1)
+
 
 -- Implementacion del estado de la partida
 module Estado(
@@ -124,12 +144,16 @@ module Estado(
     _tablero :: Tablero
     _turno :: Jugador
     _terminado :: PartidaTerminada
-    _ultimoMovimiento :: (Int, Int)
+
     --Metodos
     getTablero :: Estado -> Tablero
     getTurno :: Estado -> Jugador
     getTerminado :: Estado -> PartidaTerminada
-    getUltMov :: Estado -> (Int,Int)
+
+    switchTurno :: Estado -> 
+    creaEstado :: Tablero -> Jugador -> PartidaTerminada -> Estado
+
+    sigJugador :: Jugador -> Jugador
 
 ) where
     getTablero estado = estado._tablero
@@ -137,38 +161,42 @@ module Estado(
     getTerminado estado = estado._terminado
     getUltMov estado = estado._ultimoMovimiento
 
+    sigJugador X = O
+    sigJugador O = X
+
 
 -- ESTRUCTURA PRINCIPAL DEL JUEGO ----------------------------------------------------
 -- Llamada inicial
 main :: IO ()
 main = do
     main = do
-    diff = chooseIA         --Seleccion de la IA
+    diff <- chooseIA         --Seleccion de la IA
     let t = rand 0 1        --Generación del turno inicial
         if(t == 0) then turn = false
         else turn = true
     --Crear tablero vacio
     board <- tableroVacio
     --Llamar bucle de juego
+    estado <- creaEstado board t NoTerminada 
+    play estado
 
 -- Bucle principal del juego
 play :: Estado -> Estado 
 play estado = do
     haTerminado <- getTerminado estado
+    
     --Partida empatada
     if (haTerminado == Empate) then do
-        --Print DRAW
-
-    -- Tenemos ganador
-    if (haTerminado == Ganador Jugador) then do
-        --Print WINEER
-
-    else do 
+        printDraw
+    
+    if (haTerminado == NoTerminada) then do
         --Leer entrada de datos del jugador (usuario o IA)
-        Jugada <- leerJugada
+        jugada <- leerJugada
         --Ejecutar movimiento
-        
-        jugador = SigJugador . getTurno estado
+        jugador <- getTurno estado
+        tablero <- getTablero estado
+        newEstado <- ponerFicha tablero jugador jugada
+        setTurno estado 
         --Comprobar si el movimiento es ganador
         do cuatroEnRaya . columnaLista (getTablero estado)
         do cuatroEnRaya . filaLista 
@@ -177,4 +205,11 @@ play estado = do
         si alguna es valida -> PartidaTerminada = Ganador jugador
         si ninguna es valida -> PartidaTerminada = NoTerminada
         --Recursividad
-        play 
+        play newEstado
+
+    else do
+        -- Tenemos ganador
+        ganador <- snd . haTerminado
+        printWinner ganador
+
+        
