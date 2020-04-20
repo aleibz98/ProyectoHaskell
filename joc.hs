@@ -4,8 +4,8 @@ import Data.Vector as Vec
 -- DECLARACIONES DE TIPOS Y DATA -----------------------------------------------------
 -- Types
 type Posicion = Maybe Ficha
-type Fila = Vec.Vector Posicion
-type Tablero = Vec.Vector Fila
+type Columna = Vec.Vector Posicion
+type Tablero = Vec.Vector Columna
 type Jugador = Ficha
 
 -- Data
@@ -47,6 +47,9 @@ leerJugada Just ia = do         -- IA
 -- Implementacion del tablero de juego
 module Tablero(
     --Atributos
+    Tablero,
+    Ficha(..),
+    Jugador,
     numCols, numFilas, 
     --METODOS
     --Creacion de un tablero vacio
@@ -58,6 +61,8 @@ module Tablero(
     diagUpLista ::  Tablero -> Int -> Int -> [Posicion]
     diagDownLista :: Tablero -> Int -> Int -> [Posicion]
 
+    getPosFromVec :: Vec.Vector Posiciones -> Int -> Posicion
+
     --Obtencion de la posicion dadas las coordenadas
     getPosicion :: Tablero -> Int -> Int -> Posicion
 
@@ -67,24 +72,70 @@ module Tablero(
     movimientoValido :: Board -> Int -> Bool
 
     --Dice si existen 4 piezas del mismo jugador seguidas
-    cuatroEnRaya :: Vec.Vector Posiciones -> Maybe Jugador
+    cuatroEnRaya :: [Posicion] -> Maybe Jugador
+
 
 
 ) where
 
-    tableroVacio = Vec.replicate numCols $ Vec.replicate numFilas Nothing
+    tableroVacio = Vec.replicate 7 $ Vec.replicate 6 Nothing
 
+    getPosFromVec columna fila = do
+        return (columna !! fila)
+
+    columnaLista tablero col = do
+        return (V.toList . tablero !! col)
+
+    filaLista tablero fila = do
+        auxfila <- Vec.fromList [0..5]
+        return (Vec.toList ((Vec.map (!auxFila) tablero) !! fila))
+                
+
+    diagDownLista tablero fila col = do
+        return ListaDiag
+        where
+            ListaDiag = do 
+
+    diagUpLista tablero fila columna = do
+        return ListaDiag
+        where
+            ListaDiag = do
+
+    getPosicion tablero fila columuna = do
+        
+
+    ponerFicha tablero jugador columna = do
+        -- Mirar si columna es válida
+
+        -- 
+
+    movimientoValido tablero columna = do
+
+
+    cuatroEnRaya [] = Nothing
+    cuatroEnRaya (v:w:x:y:z)
+        | v == w && w == x && x == y = Just x
+        | otherwise = cuatroEnRaya (w:x:y:z)
+        
 
 -- Implementacion del estado de la partida
 module Estado(
     --Atributos
     _tablero :: Tablero
     _turno :: Jugador
-    _terminado :: Bool
+    _terminado :: PartidaTerminada
     _ultimoMovimiento :: (Int, Int)
     --Metodos
+    getTablero :: Estado -> Tablero
+    getTurno :: Estado -> Jugador
+    getTerminado :: Estado -> PartidaTerminada
+    getUltMov :: Estado -> (Int,Int)
 
 ) where
+    getTablero estado = estado._tablero
+    getTurno estado = estado._turno
+    getTerminado estado = estado._terminado
+    getUltMov estado = estado._ultimoMovimiento
 
 
 -- ESTRUCTURA PRINCIPAL DEL JUEGO ----------------------------------------------------
@@ -101,21 +152,29 @@ main = do
     --Llamar bucle de juego
 
 -- Bucle principal del juego
-play :: Estado -> Estado --No se que es exactamente lo de GameMonad...
-play = do
-    --Ha terminado la partida? Hay ganador?
-    depende de PartidaTerminada
-    --Leer entrada de datos del jugador (usuario o IA)
-    Jugada <- leerJugada
-    --Ejecutar movimiento
-    ponerFicha
-    jugador = SigJugador jactual
-    --Comprobar si el movimiento es ganador
-    do cuatroEnRaya . columnaLista
-    do cuatroEnRaya . filaLista
-    do cuatroEnRaya . diagUpLista
-    do cuatroEnRaya . diagDownLista
-    si alguna es valida -> PartidaTerminada = Ganador jugador
-    si ninguna es valida -> PartidaTerminada = NoTerminada
-    --Recursividad
-    play
+play :: Estado -> Estado 
+play estado = do
+    haTerminado <- getTerminado estado
+    --Partida empatada
+    if (haTerminado == Empate) then do
+        --Print DRAW
+
+    -- Tenemos ganador
+    if (haTerminado == Ganador Jugador) then do
+        --Print WINEER
+
+    else do 
+        --Leer entrada de datos del jugador (usuario o IA)
+        Jugada <- leerJugada
+        --Ejecutar movimiento
+        
+        jugador = SigJugador . getTurno estado
+        --Comprobar si el movimiento es ganador
+        do cuatroEnRaya . columnaLista (getTablero estado)
+        do cuatroEnRaya . filaLista 
+        do cuatroEnRaya . diagUpLista
+        do cuatroEnRaya . diagDownLista
+        si alguna es valida -> PartidaTerminada = Ganador jugador
+        si ninguna es valida -> PartidaTerminada = NoTerminada
+        --Recursividad
+        play 
